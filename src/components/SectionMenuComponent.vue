@@ -4,7 +4,10 @@
 
 <div class="container">
     <div class="row" v-for="data in dataSetMenuFiltered" :key="data.id+'Menu'" >
-    <CardTypeComponent :dataValue="data" ></CardTypeComponent>
+    
+      <CardTypeComponent :dataValue="data" ></CardTypeComponent>
+    
+    
     </div>
 
 </div>
@@ -65,7 +68,6 @@ export default {
 
 </script>
 
-<style>
-
+<style scoped>
 
 </style>

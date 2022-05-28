@@ -3,15 +3,15 @@
 <div class="card mb-1 onCard" @click="AddBasket(dataValue.id)">
     <div class="card-body">
     <div class="row">
-        <div class="col-10">
+        <div class="col-lg-10 col-sm-12">
             <div class="row">
-                <div class="col-4">
-            <p>{{ dataValue.subtype}}</p>
+                <div class="col-lg-4 col-sm-12">
+            <h3>{{ dataValue.subtype}}</h3>
         </div>
-            <div class="col-2">
-            <p>{{ dataValue.price}} euros</p>
+            <div class="col-lg-2 col-sm-12">
+            <p>{{ dataValue.price}} &#8364;</p>
         </div>
-                <div class="col-2">
+                <div class="col-lg-2 col-sm-12">
             <p>{{ dataValue.timePrestation}}</p>
         </div>
     </div>
@@ -22,7 +22,7 @@
         </div>
     </div>
         </div>
-        <div class="col-2 d-flex justify-content-center">
+        <div class="col-lg-2 col-sm-12 d-flex justify-content-center">
             <button v-show="boolChoice" type="button" class="btn btn-primary btn-sm " @click.stop="DeleteBasket(dataValue.id)">Retiré du panier</button>
         </div>
     </div>

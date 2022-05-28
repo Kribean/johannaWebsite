@@ -1,18 +1,19 @@
 <template>
 <div class="container">
-    <div class="row fixedArea" v-if="showValidateADate"><button class="btn btn-success btn-lg">Valider ce créneau</button></div>
     <div class="container">
          <div class="row">
          <div class="card m-2" v-for="command in listCommand" :key="command.id+'ok'">
   <div class="card-body">
-      <div class="row">
-          <div class="col-10">
-              <p>{{command.type}}|{{command.subtype}}|{{command.price}} euros</p>
+<div class="container">
+        <div class="row">
+          <div class="col-lg-10 col-sm-12">
+              <p>{{command.type}}|{{command.subtype}}|{{command.price}} &#8364;</p>
           </div>
-          <div class="col-2">
+          <div class="col-lg-2 col-sm-12">
               <button class="btn btn-danger" @click="RemoveItem(command.id)">Supprimer cette liste</button>
           </div>
       </div>
+</div>
  </div>
 
   </div>
@@ -23,7 +24,7 @@
  <div class="row m-2">
      <div class="card">
   <div class="card-body">
-    <p>Total: {{priceCommand}} euros</p>
+    <p>Total: {{priceCommand}} &#8364;</p>
   </div>
 </div>
  </div>
@@ -61,10 +62,13 @@
   <option v-for="i in 10" :key="i+'hh'">{{9+i}}h</option>
 </select>
 </div>
-<div class="row fixedArea" v-if="showValidateADate"><button class="btn btn-success btn-lg">Valider ce créneau</button></div>
+
 <div class="row" v-if="selected">
 <p>Veuillez choisir une heure précise pour commencer votre séance, le temps que vous passerez à l'institut sera de {{lapsTimeCommand/60}}h{{lapsTimeCommand%60}}min </p>
-    <div class="col-2" v-for="time in selectedTimes" :key="time"><button class="btn btn-outline-success btn-sm m-2" @click="pickTheDate()">{{time}}</button> </div>
+    
+<div class="col-lg-2 col-sm-2 m-1 d-flex justify-content-center" v-for="time in selectedTimes" :key="time"><button class="btn btn-outline-success btn-sm" @click="pickTheDate(time)" >{{time}}</button> </div>
+    
+    
 </div>
       </div>
       </div>
@@ -72,6 +76,53 @@
 
 
  </div>
+
+ <b-modal v-model="modalShow"  hide-footer>
+<div v-if="!showValidateADate">
+<div class="row">
+            <div class="text-center">
+  <img src="../assets/logo500.png" class="rounded" alt="logo Caera senses">
+</div>
+</div>
+<div class="row">
+  <p>Vous y êtes presque!</p>
+<p>Vous souhaitez être reçu le {{dayAndhour}}</p>
+<p>Si cela vous va, cliquez sur "valider le créneau" ou sinon cliquez sur annuler </p>
+</div>
+
+
+<button class="btn btn-success btn-lg" @click="showValidateADate=!showValidateADate">Valider ce créneau</button></div>
+
+<div class="container" v-else-if="showValidateADate">
+<form>
+    <div class="form-group">
+    <label for="name">Mon nom</label>
+    <input type="text" class="form-control" id="name" v-model="name" aria-describedby="nom" placeholder="Entrer votre nom" required>
+  </div>
+      <div class="form-group">
+    <label for="firstName">Mon prénom</label>
+    <input type="text" class="form-control" id="firstName" v-model="firstname" aria-describedby="prénom" placeholder="Entrer votre prénom" required>
+  </div>
+        <div class="form-group">
+    <label for="phone">Téléphone</label>
+    <input type="text" class="form-control" id="phone" v-model="phone" aria-describedby="prénom" placeholder="Entrer votre prénom" required>
+  </div>
+  <div class="form-group">
+    <label for="email">Mon email</label>
+    <input type="email" class="form-control" id="email" v-model="email" aria-describedby="email" placeholder="Entrer votre email" required>
+  </div>
+  <div class="form-group">
+    <label for="mention">Recommandation</label>
+    <textarea class="form-control" v-model="message" id="mention" placeholder="(Optionnelle) Avez vous des recommandation? Mentionnez les ici" rows="6"></textarea>
+  </div>
+
+  <button @click="submitForm" class="btn btn-primary m-3">Confirmer mon rendez-vous et Envoyer</button>
+</form>
+</div>
+ 
+ </b-modal>
+
+
 </div>
 </template>
 
@@ -90,7 +141,14 @@ export default {
             lapsTimeCommand:0,
             date: new Date(),
             selected:'',
-            showValidateADate:false
+            showValidateADate:false,
+            modalShow: false,
+            dayAndhour:'',
+            name:"",
+            firstname:"",
+            phone:"",
+            email:"",
+            message:"",
             
         }
     },
@@ -100,7 +158,10 @@ export default {
             let x= [];
             for (let i=0; i<12;i++)
             {
-                x=[...x,`${this.selected}${i*5}`]
+                x=[...x,`${this.selected}${(i*5).toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+    useGrouping: false,
+})}`]
             }
             for (let i=0; i<12;i++)
             {
@@ -111,13 +172,23 @@ export default {
             return x
             
             
-        }
+        },
+
 
     },
 
     methods: {
-        pickTheDate(){
-            this.showValidateADate=true
+        pickTheDate(time){
+    
+          
+            
+            this.modalShow = !this.modalShow
+            this.dayAndhour = `${this.date} à ${time}`
+        },
+        submitForm(){
+          this.showValidateADate=false;
+          console.log('ici sera le fetch')
+
         },
         RemoveItem(){
             /*console.log("hello")
@@ -200,5 +271,6 @@ export default {
     position: fixed;
     z-index: 1000;
 }
+
 
 </style>
