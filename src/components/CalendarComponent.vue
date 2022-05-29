@@ -66,7 +66,10 @@
 <div class="row" v-if="selected">
 <p>Veuillez choisir une heure précise pour commencer votre séance, le temps que vous passerez à l'institut sera de {{lapsTimeCommand/60}}h{{lapsTimeCommand%60}}min </p>
     
-<div class="col-lg-2 col-sm-2 m-1 d-flex justify-content-center" v-for="time in selectedTimes" :key="time"><button class="btn btn-outline-success btn-sm" @click="pickTheDate(time)" >{{time}}</button> </div>
+<div class="col-lg-2 col-sm-2 m-1 d-flex justify-content-center" v-for="time in selectedTimes" :key="time.index"><button class="btn btn-outline-success btn-sm" @click="pickTheDate(time)" >{{time.date.getHours()}}h{{time.date.getMinutes().toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+    useGrouping: false,
+})}}</button> </div>
     
     
 </div>
@@ -149,12 +152,30 @@ export default {
             phone:"",
             email:"",
             message:"",
+            allDatesMiliToFetch:[],
             
         }
     },
 
     computed: {
         selectedTimes:function(){
+
+          let X0 = [];
+          for(let i=0; i<12;i++)
+          {
+            console.log(i)
+            let dateInt = new Date(this.date.getUTCFullYear(),this.date.getMonth()+1,this.date.getDate(),this.selected.split('h')[0],i*5)
+            X0=[...X0, {index:i, date:dateInt,dateMili:dateInt.getTime() }]
+          }
+          for(let i=0; i<12;i++)
+          {
+                        let dateInt = new Date(this.date.getUTCFullYear(),this.date.getMonth()+1,this.date.getDate(),parseInt(this.selected.split('h')[0])+1,i*5)
+            X0=[...X0, {index:i+12, date:dateInt,dateMili:dateInt.getTime() }]
+            }
+            console.log(X0)
+            return X0
+          /*console.log("hello boss")
+          console.log(this.date.getHours())
             let x= [];
             for (let i=0; i<12;i++)
             {
@@ -169,7 +190,7 @@ export default {
             }
             console.log("boudoum")
             console.log(x)
-            return x
+            return x*/
             
             
         },
@@ -183,7 +204,17 @@ export default {
           
             
             this.modalShow = !this.modalShow
-            this.dayAndhour = `${this.date} à ${time}`
+            this.dayAndhour = `${this.date.getDate()}/${this.date.getMonth()+1}/${this.date.getUTCFullYear()} à ${time.date.getHours()}h${time.date.getMinutes().toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+    useGrouping: false,
+})}`
+
+            for(let i=0;i<this.lapsTimeCommand;i+=5)
+            {
+              this.allDatesMiliToFetch.push(time.dateMili+i)
+            }
+            console.log("oooooo")
+            console.log(this.allDatesMiliToFetch)
         },
         submitForm(){
           this.showValidateADate=false;
@@ -229,13 +260,13 @@ export default {
 {id:17,type:"Epilations",subtype:"Sourcils (S)",price:10,description:"",timePrestation:"15 min",timePause:15,timePrestationValue:15},
 {id:18,type:"Epilations",subtype:"Lèvre (L)",price:6,description:"",timePrestation:"10 min",timePause:15,timePrestationValue:10},
 {id:19,type:"Epilations",subtype:"Menton (M)",price:5,description:"",timePrestation:"10 min",timePause:15,timePrestationValue:10},
-{id:20,type:"Epilations",subtype:"MI + J + A",price:53,description:"",timePrestation:"1 heure 30",timePause:15,timePrestationValue:90},
-{id:21,type:"Epilations",subtype:"MI +DJ + A",price:46,description:"",timePrestation:"1 heure 15",timePause:15,timePrestationValue:75},
-{id:22,type:"Epilations",subtype:"MSI + DJ + A",price:43,description:"",timePrestation:"1 heure",timePause:15,timePrestationValue:60},
-{id:23,type:"Epilations",subtype:"S + L + M",price:16,description:"",timePrestation:"35 min",timePause:15,timePrestationValue:35},
-{id:24,type:"Epilations",subtype:"MI + J + A + S + L",price:69,description:"",timePrestation:"1 heure 45",timePause:15,timePrestationValue:105},
+{id:20,type:"Epilations",subtype:"Maillot intégral + jambes entières + aisselles",price:53,description:"",timePrestation:"1 heure 30",timePause:15,timePrestationValue:90},
+{id:21,type:"Epilations",subtype:"Maillot intégral + demi-jambes + aisselles",price:46,description:"",timePrestation:"1 heure 15",timePause:15,timePrestationValue:75},
+{id:22,type:"Epilations",subtype:"Maillot semi-intégral + demi jambes + aisselles",price:43,description:"",timePrestation:"1 heure",timePause:15,timePrestationValue:60},
+{id:23,type:"Epilations",subtype:"Sourcil + lèvre + menton",price:16,description:"",timePrestation:"35 min",timePause:15,timePrestationValue:35},
+{id:24,type:"Epilations",subtype:"Maillot intégral + jambes entières + aisselles + sourcil + lèvre",price:69,description:"",timePrestation:"1 heure 45",timePause:15,timePrestationValue:105},
 {id:25,type:"Soins des pieds",subtype:"PédiSpa",price:45,description:"Mise en beauté des pieds avec un bain des pieds, gommage, mise en forme de l'ongle, couper les cuticules et un massages des pieds.",timePrestation:"1 heure",timePause:15,timePrestationValue:60},
-{id:26,type:"Soins des pieds",subtype:"Calluspeeling",price:65,description:"Un PédiSpa complète + un masque anti-callosité avant le massage",timePrestation:"1 heure 30",timePause:15,timePrestationValue:90}]
+{id:26,type:"Soins des pieds",subtype:"PédiSpa peeling",price:65,description:"Un PédiSpa complète + un masque anti-callosité avant le massage",timePrestation:"1 heure 30",timePause:15,timePrestationValue:90}]
     console.log(dataService)
     
     if(localStorage.storeCaeraSenses){

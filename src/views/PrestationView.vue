@@ -1,7 +1,7 @@
 <template>
 
 <div>
-    <div class="container fixedArea" v-if="step==0" @click="nextStep(1)"><button class="btn btn-secondary btn-lg btn-block">Accéder à mon panier</button></div>
+    <div class="container fixedArea d-flex justify-content-end" v-if="step==0" @click="nextStep(1)"><button class="btn btn-secondary btn-lg btn-block">Accéder à mon panier</button></div>
     <div class="container">
 <div class="row">
             <div class="text-center">
