@@ -271,7 +271,8 @@ export default {
     
     if(localStorage.storeCaeraSenses){
        let x =  JSON.parse(localStorage.storeCaeraSenses);
-    this.listCommand=dataService.filter((e)=>String(e.id) in x)
+       console.log(x)
+    this.listCommand=dataService.filter((e)=> (x.includes(String(e.id)))||(x.includes((e.id))))
 
     let priceInt =0
     let lapsTimeCommandInt=0

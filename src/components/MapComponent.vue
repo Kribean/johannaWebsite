@@ -10,7 +10,7 @@
         <div class="col-12">
              <h3>Adresse et contact</h3>
              <p>Adresse: 158 rue Achille Viadieu 31400 Toulouse</p>
-             <p>Téléphone: 06544533</p>
+             <p>Téléphone: 0651 84 14 09</p>
         </div>
         
     </div>
