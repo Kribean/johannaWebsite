@@ -21,7 +21,15 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang='scss' scoped>
+
+/*$varRed:#c9c9c9;
+$primary:#c29938;
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+@mixin family{
+  font-family: 'Dancing Script', cursive;
+  color:$varRed
+}*/
 header.masthead {
     padding-top: 10.5rem;
     padding-bottom: 6rem;

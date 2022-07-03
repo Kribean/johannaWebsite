@@ -10,7 +10,7 @@
               <p>{{command.type}}|{{command.subtype}}|{{command.price}} &#8364;</p>
           </div>
           <div class="col-lg-2 col-sm-12">
-              <button class="btn btn-danger" @click="RemoveItem(command.id)">Supprimer cette liste</button>
+              <button class="btn btn-danger" @click="RemoveItem(command.id)">Supprimer toute la liste</button>
           </div>
       </div>
 </div>
@@ -24,7 +24,7 @@
  <div class="row m-2">
      <div class="card">
   <div class="card-body">
-    <p>Total: {{priceCommand}} &#8364;</p>
+    <p>Total: <strong>{{priceCommand}} &#8364;</strong></p>
   </div>
 </div>
  </div>
@@ -34,7 +34,7 @@
   <div class="card-body">
          <p>Choisissez une date</p>
 
-  <date-picker class="inline-block h-full" v-model="date">
+  <date-picker class="inline-block h-full"  v-model="date" :disabled-dates='{weekdays:[1]}'>
     <template v-slot="{ inputValue, togglePopover }">
       <div class="flex items-center">
         <button
@@ -54,11 +54,11 @@
 
   </div>
 </div>
-          <div class="card">
-  <div class="card-body">
-<div class="row">
+          <div class="card mb-5 mt-3 bg-gradient-primary text-white">
+  <div class="card-body bg-gradient-primary text-white ">
+<div class="row height-select bg-primary">
           <select v-model="selected">
-  <option disabled value="">A partir de quelle heure souhaiteriez vous votre rendez vous? Nous vous porposerons par la suite plusieurs créneaux</option>
+  <option disabled value="">A partir de quelle heure souhaiteriez vous votre rendez vous? Nous vous proposerons par la suite plusieurs créneaux</option>
   <option v-for="i in 10" :key="i+'hh'">{{9+i}}h</option>
 </select>
 </div>
@@ -96,7 +96,7 @@
 
 <button class="btn btn-success btn-lg" @click="showValidateADate=!showValidateADate">Valider ce créneau</button></div>
 
-<div class="container" v-else-if="showValidateADate">
+<div class="container" v-else-if="showValidateADate&!showValidateTheForm">
 <form>
     <div class="form-group">
     <label for="name">Mon nom</label>
@@ -122,6 +122,19 @@
   <button @click="submitForm" class="btn btn-primary m-3">Confirmer mon rendez-vous et Envoyer</button>
 </form>
 </div>
+<div class="container" v-else-if="showValidateADate&showValidateTheForm">
+<div class="row">
+<div class="col-4"><img src="../assets/logo500.png" class="img-thumbnail"/></div>
+<div class="col-8" v-if="showValidateFinalMessage==0">
+<div class="spinner-grow text-primary" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+</div>
+<div class="col-8" v-if="showValidateFinalMessage==1"><p class="h3">Formulaire validé 🥰 A bientôt</p></div>
+<div class="col-8" v-else-if="showValidateFinalMessage==2"><p> 😓 Oops nous rencontrons des difficultés à finaliser l'enregistrement, nous nous excusons de cela.</p><p class="h3"> Pourriez vous nous contacter au 0651 84 14 09</p> </div>
+
+</div>
+</div>
  
  </b-modal>
 
@@ -145,6 +158,8 @@ export default {
             date: new Date(),
             selected:'',
             showValidateADate:false,
+            showValidateTheForm:false,
+            showValidateFinalMessage:0,
             modalShow: false,
             dayAndhour:'',
             name:"",
@@ -152,7 +167,9 @@ export default {
             phone:"",
             email:"",
             message:"",
+            dateMili:0,
             allDatesMiliToFetch:[],
+            forbiddenDates:[]
             
         }
     },
@@ -163,7 +180,7 @@ export default {
           let X0 = [];
           for(let i=0; i<12;i++)
           {
-            console.log(i)
+           
             let dateInt = new Date(this.date.getUTCFullYear(),this.date.getMonth()+1,this.date.getDate(),this.selected.split('h')[0],i*5)
             X0=[...X0, {index:i, date:dateInt,dateMili:dateInt.getTime() }]
           }
@@ -172,25 +189,12 @@ export default {
                         let dateInt = new Date(this.date.getUTCFullYear(),this.date.getMonth()+1,this.date.getDate(),parseInt(this.selected.split('h')[0])+1,i*5)
             X0=[...X0, {index:i+12, date:dateInt,dateMili:dateInt.getTime() }]
             }
-            console.log(X0)
-            return X0
-          /*console.log("hello boss")
-          console.log(this.date.getHours())
-            let x= [];
-            for (let i=0; i<12;i++)
-            {
-                x=[...x,`${this.selected}${(i*5).toLocaleString("en-US", {
-    minimumIntegerDigits: 2,
-    useGrouping: false,
-})}`]
-            }
-            for (let i=0; i<12;i++)
-            {
-                x=[...x,`${parseInt(this.selected.split('h')[0])+1}h${i*5}`]
-            }
-            console.log("boudoum")
-            console.log(x)
-            return x*/
+
+            const resultX0 = X0.filter(date => !(this.forbiddenDates.includes(date['dateMili'])) );
+
+
+            /*create a function allowing filter X0 within the forbidden value. forbidden value are the days and hours already picked that you can find in variable: */
+            return resultX0
             
             
         },
@@ -209,35 +213,78 @@ export default {
     useGrouping: false,
 })}`
 
-            for(let i=0;i<this.lapsTimeCommand;i+=5)
+            for(let i=0;i<this.lapsTimeCommand;i+=5) /*5 min*/
             {
-              this.allDatesMiliToFetch.push(time.dateMili+i)
+              this.allDatesMiliToFetch.push(time.dateMili+i*60e3) /*1 min= 1*60e3 ms*/
+              console.log(this.allDatesMiliToFetch)
             }
-            console.log("oooooo")
-            console.log(this.allDatesMiliToFetch)
+            this.dateMili=time.dateMili;
         },
         submitForm(){
           this.showValidateADate=false;
-          console.log('ici sera le fetch')
+          this.showValidateTheForm=true;
+          //const API_URL='http://localhost:3000/api/appointment/createAppointment';
+          const API_URL='https://caera-senses.herokuapp.com/api/appointment/createAppointment';
+              fetch(API_URL, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+
+      },
+          body: JSON.stringify({
+name: this.name,
+  firstname:this.firstname,
+  email:this.email,
+  phone: this.phone,
+  message: this.message,
+  dateMili: this.dateMili,
+  priceCommand: this.priceCommand,
+  lapsTimeCommand: this.lapsTimeCommand,
+  allDatesMiliToFetch: this.allDatesMiliToFetch
+          }),
+    })
+      .then((result) => {
+        return result.json();
+      })
+      .then((tableauMessages) => {
+        this.tableauMessages = tableauMessages;
+        this.showValidateFinalMessage=1
+        setTimeout(()=>{
+          localStorage.clear();
+            window.location.reload()},2000);
+      }).catch(()=> {this.showValidateFinalMessage=2;
+        setTimeout(()=>{
+            window.location.reload()},10000);      
+      });
+      
 
         },
         RemoveItem(){
-            /*console.log("hello")
-            if(localStorage.storeCaeraSenses){
-            let x = JSON.parse(localStorage.storeCaeraSenses);
-            console.log(x)
-            x=x.filter((e)=>String(e)!=String(id))
-            console.log(x)
-            localStorage.setItem('storeCaeraSenses',JSON.stringify(x))
-            //window.location.reload();
-            
-            }*/
             localStorage.clear()
             window.location.reload()
         }
     },
 
     created() {
+     
+     
+     /**create the tables of the forbidden {date+hour} */
+
+    //const API_URL_GET='http://localhost:3000/api/appointment/getAllAppointment'
+    const API_URL_GET='https://caera-senses.herokuapp.com/api/appointment/getAllAppointment'
+    
+              fetch(API_URL_GET)
+      .then((result) => {
+      
+        return result.json();
+      })
+      .then((resultTab) => {
+       const n=resultTab.length;
+		for(let i=0;i<n;i++){
+		this.forbiddenDates=this.forbiddenDates.concat(resultTab[i]['allDatesMiliToFetch'])
+		}
+      });
         
         let dataService = [
 {id:0,type:"Massages",subtype:"Head Spa 30 min",price:30,description:"Massage relaxant de la tête, du visage, de la nuque, des épaules et du buste",timePrestation:"30 min",timePause:15,timePrestationValue:30},
@@ -267,11 +314,9 @@ export default {
 {id:24,type:"Forfait épilations",subtype:"Maillot intégral + jambes entières + aisselles + sourcil + lèvre",price:69,description:"",timePrestation:"1 heure 45",timePause:15,timePrestationValue:105},
 {id:25,type:"Soins des pieds",subtype:"PédiSpa",price:45,description:"Mise en beauté des pieds avec un bain des pieds, gommage, mise en forme de l'ongle, couper les cuticules et un massages des pieds.",timePrestation:"1 heure",timePause:15,timePrestationValue:60},
 {id:26,type:"Soins des pieds",subtype:"PédiSpa peeling",price:65,description:"Un PédiSpa complète + un masque anti-callosité avant le massage",timePrestation:"1 heure 30",timePause:15,timePrestationValue:90}]
-    console.log(dataService)
-    
+
     if(localStorage.storeCaeraSenses){
        let x =  JSON.parse(localStorage.storeCaeraSenses);
-       console.log(x)
     this.listCommand=dataService.filter((e)=> (x.includes(String(e.id)))||(x.includes((e.id))))
 
     let priceInt =0
@@ -289,7 +334,9 @@ export default {
 
     }
     
-    
+     
+
+  
     
     }
 
@@ -304,5 +351,8 @@ export default {
     z-index: 1000;
 }
 
+.height-select{
+  height: 100px;
+}
 
 </style>

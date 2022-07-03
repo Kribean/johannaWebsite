@@ -12,7 +12,11 @@
 </template>
 
 <style lang="scss">
+
+@mixin family{
+  font-family: 'Dancing Script', cursive;
+}
 h1, h2, h3 {
-  font-family: 'Dancing Script', cursive; ;
+  @include family
 }
 </style>
